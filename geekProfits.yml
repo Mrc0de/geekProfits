@@ -1,0 +1,6 @@
+web:
+  listen: 0.0.0.0
+  host: geekprojex.com
+  path: web
+  certfile: testCert.pem
+  keyfile: testKey.pem
