@@ -30,7 +30,7 @@ jobs:
     - name: Deploy
       run: |
           cat << EOF > ./id_rsa
-          ${{ secrets.ciuserKEY }}
+          ${{ secrets.ciKey }}
           EOF
           temp=`mktemp -d gp.XXXX`
           chmod 600 ./id_rsa
