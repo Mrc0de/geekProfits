@@ -34,10 +34,10 @@ jobs:
       EOF
       temp=`mktemp -d gp.XXXX`
       chmod 600 ./id_rsa
-      cp -R ./web $x
-      cp ./geekProfits $x
+      cp -R ./web $temp
+      cp ./geekProfits $temp
       echo "Deploying to Production Service"
-      scp -B -r -o "StrictHostKeyChecking no" -i ./id_rsa $x ${{ secrets.ciUser }}@core.geekprojex.com:/home/${{ secrets.ciUser }}/deploymentStaging/
+      scp -B -r -o "StrictHostKeyChecking no" -i ./id_rsa $temp ${{ secrets.ciUser }}@core.geekprojex.com:/home/${{ secrets.ciUser }}/deploymentStaging/
       echo "Artifacts Uploaded to Production Server"
-      ssh -t -i ./id_rsa ${{ secrets.ciUser }}@core.geekprojex.com sudo ./deployGeekProfits.sh $x
+      ssh -t -i ./id_rsa ${{ secrets.ciUser }}@core.geekprojex.com sudo ./deployGeekProfits.sh $temp
       echo "Deployment Initiated at Production Server"
