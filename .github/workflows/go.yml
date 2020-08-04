@@ -30,16 +30,16 @@ jobs:
     - name: Test
       run: go test -v .
     - name: Deploy
-      run: |        
-      cat << EOF > ./id_rsa 
-      ${{ secrets.ciKey }} 
-      EOF
-      temp=`mktemp -d gp.XXXX`
-      chmod 600 ./id_rsa
-      cp -R ./web $temp
-      cp ./geekProfits $temp
-      echo "Deploying to Production Service"
-      scp -B -r -o "StrictHostKeyChecking no" -i ./id_rsa $temp ${{ secrets.ciUser }}@core.geekprojex.com:/home/${{ secrets.ciUser }}/deploymentStaging/
-      echo "Artifacts Uploaded to Production Server"
-      ssh -t -i ./id_rsa ${{ secrets.ciUser }}@core.geekprojex.com sudo ./deployGeekProfits.sh $temp
-      echo "Deployment Initiated at Production Server"
+      run: |
+          cat << EOF > ./key
+          ${{ secrets.ciuserKEY }}
+          EOF
+          temp=`mktemp -d gp.XXXX`
+          chmod 600 ./id_rsa
+          cp -R ./web $temp
+          cp ./geekProfits $temp
+          echo "Deploying to Production Service"
+          scp -B -r -o "StrictHostKeyChecking no" -i ./id_rsa $temp ${{ secrets.ciUser }}@core.geekprojex.com:/home/${{ secrets.ciUser }}/deploymentStaging/
+          echo "Artifacts Uploaded to Production Server"
+          ssh -t -i ./id_rsa ${{ secrets.ciUser }}@core.geekprojex.com sudo ./deployGeekProfits.sh $temp
+          echo "Deployment Initiated at Production Server"
