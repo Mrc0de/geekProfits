@@ -11,16 +11,10 @@ import (
 	"time"
 )
 
-// Technically, more of a https service, http is simply redirected, never used
-
-const (
-	HTTP_REQUEST = iota
-	HTTP_ERROR
-)
-
 type httpService struct {
 	HTTPServer        *http.Server
 	HTTPServerChannel chan *httpServiceEvent
+	WsService         *WebSocketService
 	Quit              bool
 }
 
@@ -46,6 +40,13 @@ func (h *httpService) Init() {
 	// routes
 	r.HandleFunc("/", WWWHome).Methods("GET")
 	r.Use(h.LogRequest)
+
+	// Websocket Setup
+	h.WsService.WebServer = h
+	go h.WsService.WsHub.run()
+	r.HandleFunc("/ws", func(w2 http.ResponseWriter, r2 *http.Request) {
+		websocketUpgrade(h.WsService.WsHub, w2, r2)
+	})
 
 	logger.Printf("%v", h.HTTPServer)
 	h.HTTPServer = &http.Server{

@@ -41,95 +41,71 @@
             border-radius: 2px;
             box-shadow: inset 2px 2px 2px rgba(255, 255, 255, .4), inset -2px -2px 2px rgba(0, 0, 0, .4);
             padding-left: 1em;
+            padding-right: 1em;
         }
 
-        /*!*Page Container*!*/
-        /*#cryptomata {*/
-        /*    width: 100%;*/
-        /*    height: 100vh;*/
-        /*    min-height: 100vh;*/
-        /*}*/
+        #gpTitleBar {
 
-        /*!*Top Of Page*!*/
-        /*#graphBar {*/
-        /*    width: 100%;*/
-        /*    height: 10vh;*/
-        /*    min-height: 10vh;*/
-        /*    background-color: slategrey;*/
-        /*}*/
+        }
 
-        /*!* Debugger *!*/
-        /*#debugFeed {*/
-        /*    width: 100%;*/
-        /*    height: 10vh;*/
-        /*    min-height: 40vh;*/
-        /*    grid-template-columns: 20% 50% 29%;*/
-        /*    display: grid;*/
-        /*}*/
-
-        /*!* debug out *!*/
-        /*#debugFeed textarea {*/
-        /*    width: 100%;*/
-        /*    overflow-y: auto;*/
-        /*    height: 100%;*/
-        /*    min-height: 100%;*/
-        /*    resize: none;*/
-        /*    background-color: lightgray;*/
-        /*}*/
-
-        /*!*  debug in *!*/
-        /*#wsCommInput {*/
-        /*    width: 98%;*/
-        /*    margin-left: 0.25em;*/
-        /*    height: 1.5em;*/
-        /*}*/
+        #debugOut {
+            padding: 0;
+            height: 20vh;
+            background-color: black;
+            color: greenyellow;
+            background-blend-mode: color-burn;
+        }
     </style>
 {{end}}
 
 {{template "header" .}}
 
-<div id="geekProfitsHomePage">
-    GeekProfits
+<div id="geekProfitsHomePage" class="mx-auto">
+    <div id="gpTitleBar">
+        GeekProfits
+    </div>
+    <textarea id="debugOut" class="col-md"></textarea>
 </div>
 
 
 <script>
 
-    {{/*let ws = new WebSocket('wss://' + {{.WsHost}} +"/ws");*/}}
+    let ws = new WebSocket('wss://' + {{.WsHost}} +"/ws");
 
-    {{/*function dbg(msg) {*/}}
-    {{/*    $("#debugOut").text($("#debugOut").text() + "\r\n" + msg);*/}}
-    {{/*}*/}}
+    function dbg(msg) {
+        $("#debugOut").text($("#debugOut").text().trim() + "\r\n" + msg);
+    }
 
-    // dbg("[Debug Stream] Connecting...");
-    // wsSetup(ws);
+    dbg("[Debug Stream] Connecting...");
+    wsSetup(ws);
 
     /////////////////////////
-    // function wsSetup(sock) {
-    //     // Websocket Setup
-    //     sock.addEventListener('open', function (event) {
-    //         dbg("Connected!");
-    //     });
-    //     sock.addEventListener('message', function (event) {
-    //         dbg('Message from server ' + event.data);
-    //         // console.log(event);
-    //         $('#debugOut').scrollTop($('#debugOut')[0].scrollHeight);
-    //     });
-    //     sock.addEventListener('close', function (event) {
-    //         dbg('Disconnected from server ' + event);
-    //         // topBarV.WSConnected = false;
-    //     });
-    //     sock.addEventListener('error', function (event) {
-    //         dbg('Error from server ' + event);
-    //         // topBarV.WSConnected = false;
-    //     });
-    //     $("#wsCommInput").on("keypress", function (e) {
-    //         if (e.which == 13) {
-    //             sock.send($("#wsCommInput").val());
-    //             $("#wsCommInput").val("");
-    //         }
-    //     })
-    // }
+    function wsSetup(sock) {
+        // Websocket Setup
+        sock.addEventListener('open', function (event) {
+            dbg("Connected!");
+        });
+        sock.addEventListener('message', function (event) {
+            dbg('Message from server ' + event.data.trim());
+            $('#debugOut').scrollTop($('#debugOut')[0].scrollHeight);
+        });
+        sock.addEventListener('ping', function (event) {
+            dbg('Ping from server: ' + event.data);
+            $('#debugOut').scrollTop($('#debugOut')[0].scrollHeight);
+        });
+        sock.addEventListener('close', function (event) {
+            dbg('Disconnected from server ' + event);
+        });
+        sock.addEventListener('error', function (event) {
+            dbg('Error from server ' + event);
+        });
+        $("#wsCommInput").on("keypress", function (e) {
+            if (e.which === 13) {
+                sock.send($("#wsCommInput").val());
+                $("#wsCommInput").val("");
+            }
+        })
+    }
 
 
 </script>

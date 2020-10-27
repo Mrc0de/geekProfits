@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"time"
 )
 
 // Iteration 5,203,002 of BitProphet, Fourth language
@@ -59,18 +58,11 @@ func main() {
 	quitKey := make(chan os.Signal, 1)
 
 	// Start
-	WebService = &httpService{}
+	wsSrv := &WebSocketService{WebServer: nil, WsHub: newWSHub()}
+	WebService = &httpService{WsService: wsSrv}
 	WebService.Init()
 	signal.Notify(quitKey, os.Interrupt)
 	mainQuit := false
-	go func() {
-		for x := 0; x < 10; x++ {
-			time.Sleep(500 * time.Millisecond)
-			logger.Printf("Fired [%d]", x)
-			DebugChannel <- "Fired!"
-		}
-		WWWLogChannel <- "Web isnt even alive yet."
-	}()
 
 	// Loop
 	for {
@@ -88,6 +80,7 @@ func main() {
 		case <-quitKey:
 			{
 				// Start shutting down
+				logger.Println("[geekProfits] Shutting down.")
 				mainQuit = true
 			}
 		}
